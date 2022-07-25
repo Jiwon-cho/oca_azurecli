@@ -1,3 +1,4 @@
+//모듈화 적용하지 않은 통합 bicep 파일
 param name string
 param location string = resourceGroup().location
 param loc string = 'krc'
