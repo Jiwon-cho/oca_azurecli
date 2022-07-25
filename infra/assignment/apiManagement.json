@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.8.9.13224",
+      "templateHash": "5035449168584120865"
+    }
+  },
+  "parameters": {
+    "name": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "loc": {
+      "type": "string",
+      "defaultValue": "krc"
+    },
+    "publisherName": {
+      "type": "string"
+    },
+    "publisherEmail": {
+      "type": "string"
+    },
+    "apiManagementSkuCapacity": {
+      "type": "int",
+      "defaultValue": 0
+    },
+    "apiManagementSkuName": {
+      "type": "string",
+      "defaultValue": "Consumption",
+      "allowedValues": [
+        "Consumption",
+        "Isolated",
+        "Developer",
+        "Basic",
+        "Standard",
+        "Premium"
+      ]
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.ApiManagement/service",
+      "apiVersion": "2021-08-01",
+      "name": "[format('apim-{0}-{1}', parameters('name'), parameters('loc'))]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('apiManagementSkuName')]",
+        "capacity": "[parameters('apiManagementSkuCapacity')]"
+      },
+      "properties": {
+        "publisherName": "[parameters('publisherName')]",
+        "publisherEmail": "[parameters('publisherEmail')]"
+      }
+    }
+  ]
+}

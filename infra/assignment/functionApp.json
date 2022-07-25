@@ -1,0 +1,82 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.8.9.13224",
+      "templateHash": "15924258959739693315"
+    }
+  },
+  "parameters": {
+    "name": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "loc": {
+      "type": "string",
+      "defaultValue": "krc"
+    },
+    "storageAccountId": {
+      "type": "string"
+    },
+    "storageAccountName": {
+      "type": "string"
+    },
+    "appInsightsId": {
+      "type": "string"
+    },
+    "consumptionPlanId": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "fncappname": "[format('fncapp-{0}-{1}', parameters('name'), parameters('loc'))]",
+    "kind": "functionapp"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2021-03-01",
+      "name": "[variables('fncappname')]",
+      "location": "[parameters('location')]",
+      "kind": "[variables('kind')]",
+      "properties": {
+        "serverFarmId": "[parameters('consumptionPlanId')]",
+        "siteConfig": {
+          "appSettings": [
+            {
+              "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+              "value": "[format('{0}', reference(parameters('appInsightsId'), '2020-02-02', 'Full').properties.InstrumentationKey)]"
+            },
+            {
+              "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+              "value": "[format('{0}', reference(parameters('appInsightsId'), '2020-02-02', 'Full').properties.connectionString)]"
+            },
+            {
+              "name": "AzureWebJobsSecretStorage",
+              "value": "[parameters('storageAccountId')]"
+            },
+            {
+              "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};EndpointSuffix={1};AccountKey={2}', parameters('storageAccountName'), environment().suffixes.storage, listKeys(parameters('storageAccountId'), '2021-06-01').keys[0].value)]"
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "id": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Web/sites', variables('fncappname'))]"
+    },
+    "name": {
+      "type": "string",
+      "value": "[variables('fncappname')]"
+    }
+  }
+}
